@@ -365,7 +365,7 @@ def sig_lmc(C, A):
     if eig_vec.min() < 0:
         eig_vec = -eig_vec
     Pi = eig_vec.T
-    H = np.zeros((n_nodes, n_communities)):
+    H = np.zeros((n_nodes, n_communities))
     for c in communities:
         H[:, i] = (C == c).astype(float)
 
@@ -441,7 +441,7 @@ def promiscuity(S):
     P = []
     n_slices, n_nodes = S.shape
     for n in range(n_nodes):
-        p = len(np.unique(S[:, n])) - 1) / (n_slices - 1)
+        p = (len(np.unique(S[:, n])) - 1) / (n_slices - 1)
         P.append(p)
 
     return np.array(P)
@@ -578,8 +578,8 @@ def zrand(part1, part2):
     nj = nj.T
 
     M = n * (n - 1)/2.
-    M1 = ((ni.multiply(ni) - ni)) / 2.).sum()
-    M2 = ((nj.multiply(nj) - nj)) / 2.).sum()
+    M1 = ((ni.multiply(ni) - ni) / 2.).sum()
+    M2 = ((nj.multiply(nj) - nj) / 2.).sum()
 
 
     a = ((nij.multiply(nij) - nij) / 2.).sum()
