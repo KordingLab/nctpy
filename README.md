@@ -6,6 +6,8 @@ The original Matlab code snippets are available [here](http://commdetect.weebly.
 
 ## Usage
 
+Basically, the function
+
 ```python
 import commtool
 comm_ave_pairwise_spatial_dist = commtool.comm_ave_pairwise_spatial_dist(partitions, locations)
@@ -22,5 +24,5 @@ comm_ave_pairwise_spatial_dist = commtool.comm_ave_pairwise_spatial_dist(partiti
 ## Acknowledgement
 
 This repository is developed during BE 566 (Network Neuroscience)
-class at the University of Pennsylvania taught by [Prof. Danille Bassett](http://www.danisbassett.com/)
-at [Konrad Kording lab](http://kordinglab.com/)
+class at the University of Pennsylvania taught by [Prof. Danille Bassett](http://www.danisbassett.com/). The repository is developed
+at [Konrad Kording lab](http://kordinglab.com/).
