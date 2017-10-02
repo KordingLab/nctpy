@@ -12,6 +12,13 @@ comm_ave_pairwise_spatial_dist = commtool.comm_ave_pairwise_spatial_dist(partiti
 ```
 
 
+## Requirements
+
+- [numpy](http://www.numpy.org/)
+- [scikit-learn](http://scikit-learn.org/stable/index.html)
+- [networkx](https://networkx.github.io/)
+
+
 ## Acknowledgement
 
 This repository is developed during BE 566 (Network Neuroscience)
