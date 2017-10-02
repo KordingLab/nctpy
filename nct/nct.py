@@ -125,7 +125,7 @@ def comm_laterality(partitions, categories):
             surrogate_laterality.append((partition, rand_laterality))
 
     surrogate_laterality = np.array(surrogate_laterality)
-    expected_comm_laterality = np.sum(surrogate_laterality,axis = 1) / n_surrogates
+    expected_comm_laterality = np.sum(surrogate_laterality, axis=1) / n_surrogates
 
     net_laterality = (1/n_nodes) * np.dot(number_nodes_in_communities[:, 0], comm_laterality[0:n_communities, 1]) - expected_comm_laterality
     comm_laterality.append((0, net_laterality))
@@ -163,26 +163,27 @@ def comm_radius(partitions, locations):
         network (denoted as community 0).
     """
     comm_radius_array = []
+    n_nodes = len(locations)
+    n_comm = []
 
-    # diameter of entire network
-    comm_radius = pairwise_distances(locations).max()
-    comm_radius_array.append((0, comm_radius))
-
-    # diameter for each community
     for partition in np.unique(partitions):
-        nodes_in_i = np.where(partitions == partition)
-        n_nodes_in_i =  len(np.where(partitions == partition)[0])
+        nodes_in_i = np.where(partitions == partition)[0]
+        n_nodes_in_i =  len(nodes_in_i)
         if n_nodes_in_i >= 2:
             comm_nodes = locations[nodes_in_i]
-            comm_radius = pairwise_distances(comm_nodes).max()
-            comm_radius_array.append((partition, comm_radius))
-        else:
-            comm_radius_array.append((partition, 0))
+            radius_i = np.linalg.norm(np.std(comm_nodes, axis=0))
+            comm_radius_array.append((partition, radius_i))
+            n_comm.append(n_nodes_in_i)
 
-    return comm_radius_array
+    cr = np.array(comm_radius_array)
+    raduis_all = np.linalg.norm(np.std(locations, axis=0))
+    avg_comm_radius = 1 / (n_nodes * raduis_all) * np.sum(np.array(n_comm) * cr[:, 1])
+    comm_radius_array.append((0, avg_comm_radius))
+
+    return np.array(comm_radius_array)
 
 
-def comm_spatial_diameter(partitions,locations):
+def comm_spatial_diameter(partitions, locations):
     """
     Function to calculate the spatial diameter of detected communities.
 
@@ -213,26 +214,22 @@ def comm_spatial_diameter(partitions,locations):
     """
     comm_spatial_diameter_array = []
 
-    n_nodes = len(partitions)
-    n_communities = len(np.unique(partitions))
-    communities = np.unique(partitions)
-    locations = np.array(locations)
+    # diameter of entire network
+    comm_radius = pairwise_distances(locations).max()
+    comm_spatial_diameter_array.append((0, comm_radius))
 
-    # calculate entire network
-    max_dist = pairwise_distances(locations).max()
-    comm_spatial_diameter_array.append((0, max_dist)) # community 0th
+    # diameter for each community
+    for partition in np.unique(partitions):
+        nodes_in_i = np.where(partitions == partition)
+        n_nodes_in_i =  len(np.where(partitions == partition)[0])
+        if n_nodes_in_i >= 2:
+            comm_nodes = locations[nodes_in_i]
+            comm_radius = pairwise_distances(comm_nodes).max()
+            comm_spatial_diameter_array.append((partition, comm_radius))
+        else:
+            comm_spatial_diameter_array.append((partition, 0))
 
-    # calculate each community
-    for partition in communities:
-        nodes_in_i = np.where(partitions == partition)[0]
-        dist = []
-        if len(nodes_in_i) > 1:
-            for community in communities:
-                node_in_j = np.where(partitions == community)[0]
-                dist.append(list(pairwise_distances(nodes_in_i, node_in_j).ravel()))
-                max_dist_i = max(dist)
-                comm_spatial_diameter_array.append((partition, max_dist_i))
-    return np.array(comm_spatial_diameter_array)
+    return comm_spatial_diameter_array
 
 
 def comm_spatial_extent(partitions, locations):
