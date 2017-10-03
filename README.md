@@ -1,7 +1,9 @@
 # Network Community Toolbox in Python
 
-Network Connectivity Toolbox in Python (still developing).
-The original Matlab code snippets are available [here](http://commdetect.weebly.com/). The former Python version for Network Connectivity Toolbox is available [here](https://github.com/nangongwubu/Python-Version-for-Network-Community-Architecture-Toobox).
+Network Connectivity Toolbox in Python. This repository is still developing. Help us develop by putting on issues or pull-request!
+
+You can find the original Matlab code snippets are available [here](http://commdetect.weebly.com/).
+The former Python version for Network Connectivity Toolbox is available [here](https://github.com/nangongwubu/Python-Version-for-Network-Community-Architecture-Toobox).
 
 
 ## Installation

@@ -274,8 +274,11 @@ def comm_spatial_extent(partitions, locations):
         if n_nodes_in_i < n_dim + 1:
             volume = 0
         else:
-            cvh = ConvexHull(nodes_in_i)
-            volume = cvh.volume
+            try:
+                cvh = ConvexHull(nodes_in_i)
+                volume = cvh.volume
+            except:
+                volume = 0
         comm_spatial_extent_array.append((partition, volume / n_nodes_in_i))
     return np.array(comm_spatial_extent_array)
 
@@ -284,12 +287,11 @@ def q_value(C, A):
     """
     This is a function that calculates modularity
     """
-    if len(C) == 1:
-        C = C.T
+    C = np.array(C).ravel()
     n_nodes = len(A)
     cl_label = np.unique(C)
     num_cl = len(cl_label)
-    cl = np.zeros((num_node, num_cl))
+    cl = np.zeros((n_nodes, num_cl))
     for i in range(num_cl):
         cl[:, i] = (C == cl_label[i]).astype(float);
     Q_mat = ((cl.T).dot(A)).dot(cl)
@@ -304,7 +306,7 @@ def sig_perm_test(C, A, T=10):
     Inputs
     ======
     A: a N-by-N weighted adjacency matrix
-    C: a N-by-1 partition(cluster) vector
+    C: a N-by-1 partition (cluster) vector
     T: # of random permutations
 
     Outputs
@@ -315,20 +317,21 @@ def sig_perm_test(C, A, T=10):
     """
 
     n_nodes = len(A)
-    n_communities = len(np.unique(C))
+    C = np.array(C).ravel()
+    num_cl = len(np.unique(C))
     Q = q_value(C, A)
-    Q_r = np.zeros((T, n_communities, n_communities), dtype=np.float)
+    Q_r = np.zeros((T, num_cl, num_cl), dtype=np.float)
     for i in range(T):
         C_r = C[np.random.permutation(range(n_nodes))]
         Q_r[i,:,:] = q_value(C_r, A)
-    Q_avg = np.zeros((n_communities, n_communities), dtype=np.float)
-    Q_std = np.zeros((n_communities, n_communities), dtype=np.float)
+    Q_avg = np.zeros((num_cl, num_cl), dtype=np.float)
+    Q_std = np.zeros((num_cl, num_cl), dtype=np.float)
     for i in range(num_cl):
         for j in range(num_cl):
             temp = Q_r[:, i, j].flatten()
             Q_avg[i,j] = np.mean(temp)
             Q_std[i,j] = np.std(temp)
-    sig_array = np.divide((Q_mat - Q_avg), Q_std)
+    sig_array = np.divide((Q - Q_avg), Q_std)
 
     return (sig_array, Q, Q_r)
 
