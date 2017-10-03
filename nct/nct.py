@@ -5,7 +5,7 @@ from scipy.spatial import ConvexHull
 from sklearn.metrics.pairwise import pairwise_distances
 
 
-def comm_ave_pairwise_spatial_dist(partitions, locations):
+def comm_ave_pairwise_spatial_dist(partitions, locations, metric='euclidean'):
     """
     Community Average Pairwise Spatial Distance
 
@@ -20,7 +20,8 @@ def comm_ave_pairwise_spatial_dist(partitions, locations):
         Each entry contains the community index for
         node i (where communities are sequentially indexed as 1:M and M
         is the total number of detected communities).
-    locations: list or array of size N x dims,
+    locations: list or array of size N x dims
+    metric: str, pairwise metric method (using the same string list as in scikit-learn)
 
     Outputs
     =======
@@ -51,7 +52,7 @@ def comm_ave_pairwise_spatial_dist(partitions, locations):
     comm_ave_pairwise_spatial_dist.append((0, comm_avg))
     for partition in np.unique(partitions):
         if len(np.where(partitions == partition)[0]):
-            d = pairwise_distances(locations[np.where(partitions == partition)], metric='euclidean')
+            d = pairwise_distances(locations[np.where(partitions == partition)], metric=metric)
             comm_avg = d[np.triu_indices(len(d), k=1)].mean()
             comm_ave_pairwise_spatial_dist.append((partition, comm_avg))
         else:
@@ -121,7 +122,7 @@ def comm_laterality(partitions, categories):
             n_nodes_in_i = len(categories_i)
             n_0 = categories_count.get(categories_list[0], 0)
             n_1 = categories_count.get(categories_list[1], 0)
-            rand_laterality  = np.abs(n_0 - n_1) / n_nodes_in_i
+            rand_laterality = np.abs(n_0 - n_1) / n_nodes_in_i
             surrogate_laterality.append((partition, rand_laterality))
 
     surrogate_laterality = np.array(surrogate_laterality)
