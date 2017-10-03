@@ -502,6 +502,36 @@ def integration(MA, system_by_node):
     return np.array(I)
 
 
+def multislice_static_unsigned(A, g_plus=1):
+    """
+    Inputs
+    ======
+    A: (weighted) connectivity matrix
+    it is assumsed that all values of the connectivity matrix are positive
+    g_plus: the resolution parameter. If unsure, use default value of 1.
+
+    Outputs
+    =======
+    S: the partition (or community assignment of all nodes to communities)
+    Q: the modularity of the (optimal) partition
+    lAlambda: the effective fraction of antiferromagnetic edges
+        (see Onnela et al. 2011 http://arxiv.org/pdf/1006.5731v1.pdf)
+    """
+
+    Aplus = A
+    Aplus[A < 0] = 0
+
+    k_plus = np.sum(Aplus, axis=1)
+    P = np.outer(k_plus, k_plus) / sum(k_plus)
+    B = A - g_plus * P
+    lAlambda = (np.divide(A,P) < gplus).sum()
+
+    S, Q = community_louvain(B)
+    Q = Q/sum(Aplus)
+
+    return S, Q, lAlambda
+
+
 def consensus_iterative(C):
     """
     Construct a consensus (representative) partition using the iterative thresholding procedure
@@ -528,7 +558,39 @@ def consensus_iterative(C):
     Reference:
     http://commdetect.weebly.com/uploads/4/9/5/9/49593677/consensus_iterative.m
     """
-    return
+    n_part, m = C.shape
+    C_rand3 = np.zeros((m, m))
+    X = np.zeros((m, m))
+    X_rand3 = X
+
+    for i in range(n_part):
+        pr = np.random.permutation(m)
+        C_rand3[i, :] = C[i, pr]
+
+    for i in range(n_part):
+        for k in range(m):
+            for p in range(m)
+                # element (i,j) indicate the number of times node i and node j
+                if C[i, k] == C[i, p]:
+                    X[k, p] = X[k, p] + 1
+                else:
+                    X[k, p] = X[k, p] + 0
+                if C_rand3[i, k] == C_rand3[i, p]:
+                    X_rand3[k, p] = X_rand3[k, p] + 1
+                else:
+                    X_rand3[k, p] = X_rand3[k, p] + 0
+
+    X_new3 = np.zeros((m, m))
+    X_new3[X > np.triu(X_rand3, k=1).max()] = X[X > np.triu(X_rand3, k=1).max()]
+
+    S2 = []
+    for i in range(n_part):
+        s2, Q2, _ = multislice_static_unsigned(X_new3, g_plus=1)
+        S2.append(s2)
+    S2 = np.array(S2)
+    qpc = np.sum(np.abs(np.diff(S2, axis=0)))
+
+    return S2, Q2, X_new3, qpc
 
 
 def zrand(part1, part2):
@@ -824,36 +886,6 @@ def community_louvain(W, gamma=1, ci=None, B='modularity', seed=None):
         q = np.trace(B) / s  # compute modularity
 
     return ci, q
-
-
-def multislice_static_unsigned(A, g_plus=1):
-    """
-    Inputs
-    ======
-    A: (weighted) connectivity matrix
-    it is assumsed that all values of the connectivity matrix are positive
-    g_plus: the resolution parameter. If unsure, use default value of 1.
-
-    Outputs
-    =======
-    S: the partition (or community assignment of all nodes to communities)
-    Q: the modularity of the (optimal) partition
-    lAlambda: the effective fraction of antiferromagnetic edges
-        (see Onnela et al. 2011 http://arxiv.org/pdf/1006.5731v1.pdf)
-    """
-
-    Aplus = A
-    Aplus[A < 0] = 0
-
-    k_plus = np.sum(Aplus, axis=1)
-    P = np.outer(k_plus, k_plus) / sum(k_plus)
-    B = A - g_plus * P
-    lAlambda = (np.divide(A,P) < gplus).sum()
-
-    S, Q = community_louvain(B)
-    Q = Q/sum(Aplus)
-
-    return S, Q, lAlambda
 
 
 def symm_matrix(A, binary=False):
