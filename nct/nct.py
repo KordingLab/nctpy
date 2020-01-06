@@ -1,3 +1,4 @@
+from itertools import combinations
 import numpy as np
 import networkx as nx
 from collections import Counter
@@ -570,7 +571,7 @@ def consensus_iterative(C):
 
     for i in range(n_part):
         for k in range(m):
-            for p in range(m)
+            for p in range(m):
                 # element (i,j) indicate the number of times node i and node j
                 if C[i, k] == C[i, p]:
                     X[k, p] = X[k, p] + 1
@@ -663,16 +664,16 @@ def zrand(part1, part2):
 
     zRand = (a - meana) / np.sqrt(vara)
 
-    c1 = set(part1);
-    c2 = set(part2);
+    c1 = set(part1)
+    c2 = set(part2)
     H1, H2, I = 0, 0, 0
     for i in c1:
         pi = np.double(ni[i])/n
         H1 = H1 - pi * np.log(pi)
         for j in c2:
             if nij[i,j]:
-                pj = np.double(nj[j])/n;
-                pij = np.double(nij[i,j])/n;
+                pj = np.double(nj[j])/n
+                pij = np.double(nij[i,j])/n
                 I = I + pij * np.log(pij/ (pi * pj))
     for j in c2:
         pj = np.double(nj[j]) / n
@@ -950,6 +951,7 @@ def regular_matrix_generator(G, r):
         highest weights randomly distributed across the nodes,
         and so on
     """
+    G = np.array(G)
     n = len(G)
     r = int(r)
     B = np.triu(G).ravel()
@@ -966,7 +968,7 @@ def regular_matrix_generator(G, r):
             a = np.random.randint(0, n)
             while B[a, z] == 0 and z != r:
                 a = np.random.randint(0, n)
-            y_coor = np.mod(i + z - 1, n) + 1
+            y_coor = np.mod(i + z - 1, n)
             M[i, y_coor] = B[a, z]
             M[y_coor, i] = B[a, z]
             B[a, z] = 0
