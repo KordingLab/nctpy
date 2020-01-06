@@ -2,6 +2,7 @@ from itertools import combinations
 import numpy as np
 import networkx as nx
 from collections import Counter
+import scipy.sparse as sp
 from scipy.spatial import ConvexHull
 from sklearn.metrics.pairwise import pairwise_distances
 
@@ -132,7 +133,7 @@ def comm_laterality(partitions, categories):
     net_laterality = (1/n_nodes) * np.dot(number_nodes_in_communities[:, 0], comm_laterality[0:n_communities, 1]) - expected_comm_laterality
     comm_laterality.append((0, net_laterality))
 
-    return np.array(comm_laterality_array)
+    return np.array(comm_laterality)
 
 
 def comm_radius(partitions, locations):
@@ -295,7 +296,7 @@ def q_value(C, A):
     num_cl = len(cl_label)
     cl = np.zeros((n_nodes, num_cl))
     for i in range(num_cl):
-        cl[:, i] = (C == cl_label[i]).astype(float);
+        cl[:, i] = (C == cl_label[i]).astype(float)
     Q_mat = ((cl.T).dot(A)).dot(cl)
     return Q_mat
 
@@ -526,7 +527,7 @@ def multislice_static_unsigned(A, g_plus=1):
     k_plus = np.sum(Aplus, axis=1)
     P = np.outer(k_plus, k_plus) / sum(k_plus)
     B = A - g_plus * P
-    lAlambda = (np.divide(A,P) < gplus).sum()
+    lAlambda = (np.divide(A,P) < g_plus).sum()
 
     S, Q = community_louvain(B)
     Q = Q/sum(Aplus)
@@ -635,8 +636,8 @@ def zrand(part1, part2):
         return
     n_1 = len(set(part1)) + 1
     n_2 = len(set(part2)) + 1
-    nij = sparse.csr_matrix((np.ones(part1.shape, dtype=int), (part1, part2)),
-                             shape=(n_1, n_2))
+    nij = sp.csr_matrix((np.ones(part1.shape, dtype=int), (part1, part2)), 
+                        shape=(n_1, n_2))
     ni = nij.sum(axis=1)
     nj = nij.sum(axis=0)
     nj = nj.T
@@ -654,8 +655,8 @@ def zrand(part1, part2):
     meana = M1 * M2 / M
     SAR = (a - meana) / ((M1 + M2)/2. - meana)
 
-    C1 = 4*((np.power(ni, 3)).sum()) - 8 * (n+1) * M1 + n * (n * n - 3 * n - 2)
-    C2 = 4*((np.power(nj, 3)).sum()) - 8 * (n+1) * M2 + n * (n * n - 3 * n - 2)
+    C1 = 4 * ((np.power(ni, 3)).sum()) - 8 * (n+1) * M1 + n * (n * n - 3 * n - 2)
+    C2 = 4 * ((np.power(nj, 3)).sum()) - 8 * (n+1) * M2 + n * (n * n - 3 * n - 2)
 
     vara = M/16 - np.power((4 * M1 - 2 * M), 2) * np.power((4 * M2 - 2 * M), 2)/(256 * M * M) + \
         C1 * C2/(16 * n * (n - 1) * (n - 2)) + \
